@@ -1,4 +1,4 @@
-# signet-metadata-backend
+# signet-self-hosted-metadata-backend
 
 ## Usage
 
@@ -15,27 +15,23 @@ The allow-list by default filters all except two queries
 ```graphql
 query TxMetadataByPk(
   $timepoint_height: Int!
-  $timepoint_index: Int!
   $multisig: String!
   $chain: String!
 ) {
   tx_metadata_by_pk(
     multisig: $multisig
     timepoint_height: $timepoint_height
-    timepoint_index: $timepoint_index
     chain: $chain
   ) {
     call_data
     description
   }
 }
-
 ```
 
 ```graphql
 mutation InsertTxMetadata(
   $timepoint_height: Int!
-  $timepoint_index: Int!
   $call_data: String!
   $chain: String!
   $multisig: String!
@@ -44,7 +40,6 @@ mutation InsertTxMetadata(
   insert_tx_metadata(
     objects: {
       timepoint_height: $timepoint_height
-      timepoint_index: $timepoint_index
       call_data: $call_data
       chain: $chain
       multisig: $multisig
@@ -57,7 +52,6 @@ mutation InsertTxMetadata(
     }
   }
 }
-
 ```
 
 ## TODO

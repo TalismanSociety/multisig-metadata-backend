@@ -1,5 +1,5 @@
 {
-  "resource_version": 11,
+  "resource_version": 31,
   "metadata": {
     "version": 3,
     "sources": [
@@ -11,7 +11,41 @@
             "table": {
               "name": "tx_metadata",
               "schema": "public"
-            }
+            },
+            "insert_permissions": [
+              {
+                "role": "public",
+                "permission": {
+                  "check": {},
+                  "columns": [
+                    "created",
+                    "call_data",
+                    "multisig",
+                    "timepoint_height",
+                    "description",
+                    "chain",
+                    "timepoint_index"
+                  ]
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "public",
+                "permission": {
+                  "columns": [
+                    "created",
+                    "call_data",
+                    "multisig",
+                    "timepoint_height",
+                    "description",
+                    "chain",
+                    "timepoint_index"
+                  ],
+                  "filter": {}
+                }
+              }
+            ]
           }
         ],
         "configuration": {
@@ -30,6 +64,10 @@
         "name": "allowed-queries",
         "definition": {
           "queries": [
+            {
+              "name": "InsertTxMetadata",
+              "query": "mutation InsertTxMetadata($timepoint_height: Int!, $timepoint_index: Int!, $call_data: String!, $chain: String!, $multisig: String!, $description: String!) {\n  insert_tx_metadata(objects: {timepoint_height: $timepoint_height, timepoint_index: $timepoint_index, call_data: $call_data, chain: $chain, multisig: $multisig, description: $description}) {\n    affected_rows\n    returning {\n      created\n    }\n  }\n}\n"
+            },
             {
               "name": "TxMetadataByPk",
               "query": "query TxMetadataByPk($timepoint_height: Int!, $timepoint_index: Int!, $multisig: String!, $chain: String!) {\n  tx_metadata_by_pk(multisig: $multisig, timepoint_height: $timepoint_height, timepoint_index: $timepoint_index, chain: $chain) {\n    call_data\n    description\n  }\n}\n"
