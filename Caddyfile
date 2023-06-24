@@ -1,0 +1,22 @@
+{
+	order rate_limit before basicauth
+}
+
+:80 {
+	reverse_proxy :8080
+
+	route /helloworld* {
+		respond "Hello World"
+	}
+
+	rate_limit {
+		zone dynamic {
+			key    "{ http.request.remote.host }"
+			events 30
+			window 30s
+		}
+	}
+	log {
+		format console
+	}
+}
