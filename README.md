@@ -8,6 +8,8 @@
 
 Hasura will be directly accessible on 8080, and behind a reverse proxy on 80 which also includes ratelimiting rules.
 
+If you get `Failed to connect to localhost` error, replace `localhost` in .env with `host.docker.internal`.
+
 ## TODO
 
 - Validation of calldata (confirming it exists on-chain) before setting it in the DB
