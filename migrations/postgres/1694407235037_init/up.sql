@@ -1,6 +1,4 @@
 SET check_function_bodies = false;
-CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
-COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 CREATE TABLE public.tx_metadata (
     created timestamp with time zone DEFAULT now() NOT NULL,
     call_data text NOT NULL,

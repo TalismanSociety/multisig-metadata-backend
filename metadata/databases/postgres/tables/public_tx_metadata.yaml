@@ -1,0 +1,29 @@
+table:
+  name: tx_metadata
+  schema: public
+insert_permissions:
+  - role: public
+    permission:
+      check: {}
+      columns:
+        - created
+        - call_data
+        - multisig
+        - timepoint_height
+        - description
+        - chain
+        - timepoint_index
+        - change_config_details
+select_permissions:
+  - role: public
+    permission:
+      columns:
+        - created
+        - call_data
+        - multisig
+        - timepoint_height
+        - description
+        - chain
+        - timepoint_index
+        - change_config_details
+      filter: {}
