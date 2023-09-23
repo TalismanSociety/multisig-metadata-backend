@@ -6,10 +6,13 @@ services:
       - "8080:8080"
     restart: always
     # todo: automatically load metadata from directory
-    # volumes:
-      # - "./hasura-metadata:/hasura-metadata"
+    volumes:
+      - "./migrations:/hasura-migrations"
+      - "./metadata:/hasura-metadata"
     environment:
-      ## postgres database to store Hasura metadata
+      HASURA_GRAPHQL_MIGRATIONS_DIR: /hasura-migrations
+      HASURA_GRAPHQL_METADATA_DIR: /hasura-metadata
+      # postgres database to store Hasura metadata
       HASURA_GRAPHQL_METADATA_DATABASE_URL: ${PG_DATABASE_URL}
       ## this env var can be used to add the above postgres database to Hasura as a data source. this can be removed/updated based on your needs
       PG_DATABASE_URL: ${PG_DATABASE_URL}
@@ -56,7 +59,7 @@ services:
   caddy:
     build:
       context: .
-      dockerfile: './dockerfiles/caddy.dockerfile'
+      dockerfile: "./dockerfiles/caddy.dockerfile"
     restart: unless-stopped
     network_mode: host
     volumes:
