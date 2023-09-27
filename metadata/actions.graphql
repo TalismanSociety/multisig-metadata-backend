@@ -1,0 +1,19 @@
+type Mutation {
+  InsertTxMetadataValidated(
+    timepoint_height: Int!
+    timepoint_index: Int!
+    call_data: String!
+    call_hash: String!
+    chain: String!
+    multisig_address: String!
+    proxy_address: String!
+    description: String!
+    change_config_details: json
+  ): Output
+}
+
+type Output {
+  success: Boolean!
+  timestamp: timestamptz!
+}
+
