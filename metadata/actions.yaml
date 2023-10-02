@@ -1,6 +1,13 @@
-actions: []
+actions:
+  - name: InsertTxMetadataValidated
+    definition:
+      kind: synchronous
+      handler: http://actions-service:3030/InsertTxMetadataValidated
+    permissions:
+      - role: public
 custom_types:
   enums: []
   input_objects: []
-  objects: []
+  objects:
+    - name: Output
   scalars: []

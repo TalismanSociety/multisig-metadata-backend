@@ -1,6 +1,13 @@
 table:
   name: tx_metadata
   schema: public
+configuration:
+  column_config:
+    proxy_address:
+      custom_name: proxy_address
+  custom_column_names:
+    proxy_address: proxy_address
+  custom_root_fields: {}
 insert_permissions:
   - role: public
     permission:
@@ -8,7 +15,7 @@ insert_permissions:
       columns:
         - created
         - call_data
-        - multisig
+        - proxy_address
         - timepoint_height
         - description
         - chain
@@ -20,7 +27,7 @@ select_permissions:
       columns:
         - created
         - call_data
-        - multisig
+        - proxy_address
         - timepoint_height
         - description
         - chain
