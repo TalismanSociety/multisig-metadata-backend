@@ -7,11 +7,10 @@ services:
     restart: always
     # todo: automatically load metadata from directory
     volumes:
-      - "./migrations:/hasura-migrations"
-      - "./metadata:/hasura-metadata"
+      - "./hasura:/hasura"
     environment:
-      HASURA_GRAPHQL_MIGRATIONS_DIR: /hasura-migrations
-      HASURA_GRAPHQL_METADATA_DIR: /hasura-metadata
+      HASURA_GRAPHQL_MIGRATIONS_DIR: /hasura/migrations
+      HASURA_GRAPHQL_METADATA_DIR: /hasura/metadata
       # postgres database to store Hasura metadata
       HASURA_GRAPHQL_METADATA_DATABASE_URL: ${PG_DATABASE_URL}
       ## this env var can be used to add the above postgres database to Hasura as a data source. this can be removed/updated based on your needs
@@ -37,7 +36,7 @@ services:
         max-file: "3"
   actions-service:
     build:
-      context: ./actions-service
+      context: ./services/actions-service
       dockerfile: Dockerfile
     ports:
       - "3030:3030"
