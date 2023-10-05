@@ -5,9 +5,36 @@ actions:
       handler: http://actions-service:3030/InsertTxMetadataValidated
     permissions:
       - role: public
+  - name: siwsNonce
+    definition:
+      kind: synchronous
+      handler: http://siws-service:3031/nonce
+      request_transform:
+        method: POST
+        query_params: {}
+        template_engine: Kriti
+        version: 2
+    permissions:
+      - role: public
+    comment: Generates a Nonce for SIWS
+  - name: siwsVerify
+    definition:
+      kind: synchronous
+      handler: http://siws-service:3031/verify
+      forward_client_headers: true
+      request_transform:
+        method: POST
+        query_params: {}
+        template_engine: Kriti
+        version: 2
+    permissions:
+      - role: public
+    comment: Verify that a client is able to sign a nonce within the same session
 custom_types:
   enums: []
   input_objects: []
   objects:
     - name: Output
+    - name: SiwsNonceOutput
+    - name: SiwsVerifyOutput
   scalars: []

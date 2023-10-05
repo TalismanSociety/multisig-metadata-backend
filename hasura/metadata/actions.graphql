@@ -12,8 +12,27 @@ type Mutation {
   ): Output
 }
 
+type Mutation {
+  siwsNonce: SiwsNonceOutput!
+}
+
+type Mutation {
+  siwsVerify(
+    address: String!
+    signedMessage: String!
+  ): SiwsVerifyOutput
+}
+
 type Output {
   success: Boolean!
   timestamp: timestamptz!
+}
+
+type SiwsNonceOutput {
+  nonce: String!
+}
+
+type SiwsVerifyOutput {
+  accessToken: String!
 }
 

@@ -50,6 +50,21 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+  siws-service:
+    build:
+      context: ./services/siws-service
+      dockerfile: Dockerfile
+    ports:
+      - "3031:3031"
+    environment:
+      SIWS_SERVICE_PORT: 3031
+    depends_on:
+      - graphql-engine
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
   data-connector-agent:
     image: hasura/graphql-data-connector:v2.28.0
     restart: always

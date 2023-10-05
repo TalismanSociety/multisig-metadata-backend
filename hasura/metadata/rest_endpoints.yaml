@@ -1,1 +1,18 @@
-[]
+- comment: ""
+  definition:
+    query:
+      collection_name: allowed-queries
+      query_name: Get SIWS Nonce
+  methods:
+    - POST
+  name: Get SIWS Nonce
+  url: siws-nonce
+- comment: ""
+  definition:
+    query:
+      collection_name: allowed-queries
+      query_name: Verify SIWS Nonce
+  methods:
+    - POST
+  name: Verify SIWS Nonce
+  url: siws-verify

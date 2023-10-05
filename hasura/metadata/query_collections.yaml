@@ -25,3 +25,17 @@
               change_config_details
             }
           }
+      - name: Get SIWS Nonce
+        query: |
+          mutation SiwsNonce {
+            siwsNonce {
+              nonce
+            }
+          }
+      - name: Verify SIWS Nonce
+        query: |
+          mutation MyMutation ($address: String!, $signedMessage: String!) {
+            siwsVerify(address: $address, signedMessage: $signedMessage) {
+              accessToken
+            }
+          }
