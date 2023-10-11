@@ -1,11 +1,18 @@
 import express from "express"
 import Session from "express-session"
 import crypto from "crypto"
+import jwt from "jsonwebtoken"
 import { cryptoWaitReady, signatureVerify } from "@polkadot/util-crypto"
+import { getOrCreateUserByIdentifier } from "./user"
+import { getJwtSecret } from "./utils"
 
 require("dotenv").config()
 
 const app = express()
+const jwtSecret = getJwtSecret()
+
+if (!jwtSecret) throw Error("Failed to start service. JWT secret not provided")
+
 app.use(express.json())
 
 app.use(
@@ -30,38 +37,56 @@ app.post("/nonce", async (req, res) => {
 
 // verify that user has signed a message with the nonce stored in session
 app.post("/verify", async (req, res) => {
-  console.log(req.session, req.body)
-  // @ts-ignore
-  const { nonce } = req.session
-  const { address, signedMessage } = req.body
+  try {
+    // @ts-ignore
+    const { nonce } = req.session
+    const { address, signedMessage } = req.body.input
 
-  // invalid session
-  if (!nonce) {
-    return res.status(401).json({ error: "Session missing nonce" })
+    // invalid session
+    if (!nonce) {
+      return res.status(401).json({ error: "Session missing nonce" })
+    }
+
+    // missing address or signed message
+    if (!address || !signedMessage) {
+      return res.status(400).json({ error: "Missing Parameters" })
+    }
+
+    // construct payload - must match payload in client
+    // TODO: make a package that both frontend and backend use to construct payload
+    const payload = JSON.stringify({ address, nonce }, undefined, 2)
+
+    await cryptoWaitReady()
+    const verification = signatureVerify(payload, signedMessage, address)
+
+    // invalid signature
+    if (!verification.isValid) {
+      return res.status(401).json({ error: "Invalid Signature" })
+    }
+
+    // get user data from database, create if none
+    const { user } = await getOrCreateUserByIdentifier(address, "ss58")
+
+    const jwtPayload = {
+      "https://hasura.io/jwt/claims": {
+        "x-hasura-user-id": user.id,
+        "x-hasura-allowed-roles": ["user", "public"],
+        "x-hasura-default-role": "user",
+      },
+    }
+
+    console.log(jwtSecret)
+    //make JWT token for user
+    const jwtToken = jwt.sign(jwtPayload, jwtSecret.key, {
+      algorithm: jwtSecret.type,
+    })
+
+    return res.json({ accessToken: jwtToken })
+  } catch (e) {
+    console.error(`Error in /verify`)
+    console.error(e)
+    res.status(500).json({ error: "Internal Server Error" })
   }
-
-  // missing address or signed message
-  if (!address || !signedMessage) {
-    return res.status(400).json({ error: "Missing Parameters" })
-  }
-
-  // construct payload - must match payload in client
-  // TODO: make a package that both frontend and backend use to construct payload
-  const payload = JSON.stringify({ address, nonce }, undefined, 2)
-
-  await cryptoWaitReady()
-  const verification = signatureVerify(payload, signedMessage, address)
-
-  // invalid signature
-  if (!verification.isValid) {
-    return res.status(401).json({ error: "Invalid Signature" })
-  }
-
-  // TODO: get user data from database
-
-  // TODO: make JWT token for user
-
-  return res.json({ accessToken: "token" })
 })
 
 app.listen(process.env.SIWS_SERVICE_PORT, () => {

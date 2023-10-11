@@ -9,7 +9,14 @@ type Mutation {
     proxy_address: String!
     description: String!
     change_config_details: json
+    team_id: String!
   ): Output
+}
+
+type Mutation {
+  insertMultisigProxy(
+    team: InsertMultisigProxyInput!
+  ): InsertMultisigProxyOutput!
 }
 
 type Mutation {
@@ -23,6 +30,14 @@ type Mutation {
   ): SiwsVerifyOutput
 }
 
+input InsertMultisigProxyInput {
+  name: String!
+  chain: String!
+  multisig_config: json!
+  proxied_address: String!
+  delegatee_address: String!
+}
+
 type Output {
   success: Boolean!
   timestamp: timestamptz!
@@ -34,5 +49,20 @@ type SiwsNonceOutput {
 
 type SiwsVerifyOutput {
   accessToken: String!
+}
+
+type CreatedMultisigProxyTeam {
+  id: String!
+  name: String!
+  multisig_config: json!
+  proxied_address: String!
+  delegatee_address: String!
+  chain: String!
+}
+
+type InsertMultisigProxyOutput {
+  success: Boolean!
+  team: CreatedMultisigProxyTeam
+  error: String
 }
 

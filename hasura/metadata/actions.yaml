@@ -5,6 +5,19 @@ actions:
       handler: http://actions-service:3030/InsertTxMetadataValidated
     permissions:
       - role: public
+  - name: insertMultisigProxy
+    definition:
+      kind: synchronous
+      handler: http://actions-service:3030/team/insert-multisig-proxy
+      forward_client_headers: true
+      request_transform:
+        method: POST
+        query_params: {}
+        template_engine: Kriti
+        version: 2
+    permissions:
+      - role: public
+      - role: user
   - name: siwsNonce
     definition:
       kind: synchronous
@@ -32,9 +45,12 @@ actions:
     comment: Verify that a client is able to sign a nonce within the same session
 custom_types:
   enums: []
-  input_objects: []
+  input_objects:
+    - name: InsertMultisigProxyInput
   objects:
     - name: Output
     - name: SiwsNonceOutput
     - name: SiwsVerifyOutput
+    - name: CreatedMultisigProxyTeam
+    - name: InsertMultisigProxyOutput
   scalars: []
