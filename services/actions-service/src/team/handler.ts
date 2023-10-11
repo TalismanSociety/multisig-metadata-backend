@@ -1,6 +1,7 @@
 import { Express, Request, Response } from "express"
 import { Address, parseAddresses, toMultisigAddress } from "../utils/address"
 import { createMultisigProxyTeam } from "./mutation"
+import { getUserById } from "../user/hasura"
 
 // we assume this call will only ever be made via Hasura Action
 // where input parameters are already validated
@@ -11,6 +12,10 @@ export const handleInsertMultisigProxy = async (req: Request, res: Response) => 
 
     if (role !== "user" || !userId)
       return res.status(200).json({ success: false, error: "Unauthorized" })
+
+    const user = await getUserById(userId)
+
+    if (!user) return res.status(200).json({ success: false, error: "Account not found" })
 
     const team = req.body.input.team
 
@@ -49,6 +54,15 @@ export const handleInsertMultisigProxy = async (req: Request, res: Response) => 
     const { addresses: signers, hasInvalid } = parseAddresses(signersAddresses)
     if (hasInvalid) return res.status(200).json({ success: false, error: "Invalid signer address" })
 
+    const userAddress = Address.fromSs58(user.identifier)
+    if (!userAddress) return res.status(200).json({ success: false, error: "Invalid user address" })
+
+    // make sure creator is a signer
+    if (!signers.find((s) => s.isEqual(userAddress))) {
+      res.status(200).json({ success: false, error: "Creator is not signer of multisig." })
+      return
+    }
+
     const multisigAddress = toMultisigAddress(signers, threshold)
     if (!multisigAddress.isEqual(delegateeAddress))
       return res.status(200).json({
@@ -77,7 +91,7 @@ export const handleInsertMultisigProxy = async (req: Request, res: Response) => 
   } catch (e) {
     console.error("Error in handleInsertMultisigProxy:")
     console.error(e)
-    res.status(400).json({ success: false, error: "Internal Server Error" })
+    res.status(200).json({ success: false, error: "Internal Server Error" })
   }
 }
 
