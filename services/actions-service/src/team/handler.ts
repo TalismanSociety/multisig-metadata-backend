@@ -1,21 +1,16 @@
 import { Express, Request, Response } from "express"
 import { Address, parseAddresses, toMultisigAddress } from "../utils/address"
 import { createMultisigProxyTeam } from "./mutation"
-import { getUserById } from "../user/hasura"
+import { getHasuraSession } from "../user/utils"
 
 // we assume this call will only ever be made via Hasura Action
 // where input parameters are already validated
 export const handleInsertMultisigProxy = async (req: Request, res: Response) => {
   try {
-    const userId = req.body.session_variables?.["x-hasura-user-id"]
-    const role = req.body.session_variables?.["x-hasura-role"]
+    const { user, error } = await getHasuraSession(req)
 
-    if (role !== "user" || !userId)
-      return res.status(200).json({ success: false, error: "Unauthorized" })
-
-    const user = await getUserById(userId)
-
-    if (!user) return res.status(200).json({ success: false, error: "Account not found" })
+    if (!user || error)
+      return res.status(200).json({ success: false, error: error ?? "Unauthorized" })
 
     const team = req.body.input.team
 
@@ -90,6 +85,19 @@ export const handleInsertMultisigProxy = async (req: Request, res: Response) => 
     })
   } catch (e) {
     console.error("Error in handleInsertMultisigProxy:")
+    console.error(e)
+    res.status(200).json({ success: false, error: "Internal Server Error" })
+  }
+}
+
+export const handleUpdateMultisigConfig = async (req: Request, res: Response) => {
+  try {
+    const { user, error } = await getHasuraSession(req)
+
+    if (!user || error)
+      return res.status(200).json({ success: false, error: error ?? "Unauthorized" })
+  } catch (e) {
+    console.error("Error in handleUpdateMultisigConfig:")
     console.error(e)
     res.status(200).json({ success: false, error: "Internal Server Error" })
   }

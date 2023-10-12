@@ -1,12 +1,12 @@
 import { hasuraRequest } from "../lib/hasura"
 
-export const getUserById = async (
-  id: string
-): Promise<{
+export type User = {
   id: string
   identifier: string
   identifier_type: string
-}> => {
+}
+
+export const getUserById = async (id: string): Promise<User | null> => {
   const userQuery = await hasuraRequest(
     `
         query geUserById($id: uuid!) {
@@ -20,5 +20,5 @@ export const getUserById = async (
     { id }
   )
 
-  return userQuery.data.user_by_pk
+  return userQuery.data.user_by_pk ?? null
 }

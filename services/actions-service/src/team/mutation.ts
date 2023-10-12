@@ -54,3 +54,47 @@ export const createMultisigProxyTeam = async (team: {
 
   return res.data.insert_team_one
 }
+
+/**
+ * Does 3 things:
+ * 1. remove signers that are not in the new signers list
+ * 2. add new signers lists to roles
+ * 3. update team's multisig_config and addresses
+ *
+ * Notes:
+ * 1. Only signer roles are removed. In the future we may add non signer roles that should not be affected by signers config change (e.g. admin)
+ * 2. If a user is signer and has non-signer role, the insert will not update their role to signer, which is expected. (See `constraint` and `update_columns` in the insert_team_user_role mutation)
+ */
+const UPDATE_MULTISIG_CONFIG_MUTATION = `
+  mutation updateMultisigConfigMutation(
+    $id: uuid!, 
+    $multisigConfig: json!,
+    $delegateeAddress: String!,
+    $roles: [team_user_role_insert_input!]!,
+    $signerAddresses: [String!]!
+  ) {
+    delete_team_user_role(where: {
+      _and: [
+        {role: {_eq: "signer"}},
+        {team_id: {_eq: $id}},
+        {user: {
+          _and: {
+            identifier: {_nin: $signerAddresses},
+            identifier_type: {_eq: "ss58"}
+          }
+        }}
+      ]
+    }) {
+      affected_rows
+    }
+    
+    insert_team_user_role(
+      objects: $roles
+      constraint: team_user_role_user_id_team_id_key
+      update_columns: [user_id, team_id]
+    ) {
+      affected_rows
+    }
+  }
+`
+export const updateMultisigConfig = () => {}
