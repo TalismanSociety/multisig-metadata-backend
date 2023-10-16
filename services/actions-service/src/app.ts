@@ -2,8 +2,8 @@ import "@polkadot/api-augment/substrate"
 
 import express from "express"
 
-import { createTxMetadataHandlers, handleInsertTxMetadataValidated } from "./tx_metadata/handler"
-import { createTeamHandlers } from "./team/handler"
+import { createTxMetadataHandlers } from "./tx_metadata/tx_metadata.handlers"
+import { createTeamHandlers } from "./team/team.handlers"
 
 const app = express()
 app.use(express.json())

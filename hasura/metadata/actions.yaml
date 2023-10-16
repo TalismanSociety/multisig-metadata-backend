@@ -43,14 +43,29 @@ actions:
     permissions:
       - role: public
     comment: Verify that a client is able to sign a nonce within the same session
+  - name: updateMultisigConfig
+    definition:
+      kind: synchronous
+      handler: http://actions-service:3030/team/update-multisig-config
+      forward_client_headers: true
+      request_transform:
+        method: POST
+        query_params: {}
+        template_engine: Kriti
+        version: 2
+    permissions:
+      - role: user
 custom_types:
   enums: []
   input_objects:
     - name: InsertMultisigProxyInput
+    - name: ChangeConfigDetailsInput
   objects:
     - name: Output
     - name: SiwsNonceOutput
     - name: SiwsVerifyOutput
     - name: CreatedMultisigProxyTeam
     - name: InsertMultisigProxyOutput
+    - name: CommonActionOutput
+    - name: CommonOutput
   scalars: []

@@ -2,6 +2,7 @@ import express from "express"
 import Session from "express-session"
 import crypto from "crypto"
 import jwt from "jsonwebtoken"
+import cors from "cors"
 import { cryptoWaitReady, signatureVerify } from "@polkadot/util-crypto"
 import { getOrCreateUserByIdentifier } from "./user"
 import { getJwtSecret } from "./utils"
@@ -13,7 +14,17 @@ const jwtSecret = getJwtSecret()
 
 if (!jwtSecret) throw Error("Failed to start service. JWT secret not provided")
 
+app.set("trust proxy", 2)
+
 app.use(express.json())
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      return callback(null, true)
+    },
+    credentials: true,
+  })
+)
 
 app.use(
   Session({
@@ -21,9 +32,14 @@ app.use(
     secret: "siwe-quickstart-secret",
     resave: true,
     saveUninitialized: true,
-    cookie: { secure: false, sameSite: true },
+    proxy: true,
+    cookie: { secure: true, sameSite: "none", httpOnly: true },
   })
 )
+
+app.get("/status", (req, res) => {
+  res.status(200).send("OK")
+})
 
 // generates a nonce and store it in session for later verification
 app.post("/nonce", async (req, res) => {
@@ -40,7 +56,7 @@ app.post("/verify", async (req, res) => {
   try {
     // @ts-ignore
     const { nonce } = req.session
-    const { address, signedMessage } = req.body.input
+    const { address, signedMessage } = req.body
 
     // invalid session
     if (!nonce) {
@@ -75,7 +91,6 @@ app.post("/verify", async (req, res) => {
       },
     }
 
-    console.log(jwtSecret)
     //make JWT token for user
     const jwtToken = jwt.sign(jwtPayload, jwtSecret.key, {
       algorithm: jwtSecret.type,
@@ -91,6 +106,6 @@ app.post("/verify", async (req, res) => {
 
 app.listen(process.env.SIWS_SERVICE_PORT, () => {
   console.log(
-    `Webhook service running on http://host.docker.internal:${process.env.SIWS_SERVICE_PORT}/`
+    `SIWS service running on http://host.docker.internal:${process.env.SIWS_SERVICE_PORT}/`
   )
 })

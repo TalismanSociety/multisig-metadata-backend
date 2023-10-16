@@ -8,7 +8,7 @@ const CREATE_MULTISIG_PROXY_TEAM_MUTATION = `
     }
 `
 
-// TODO: add creator (JWT token owner) to team if not in signer list
+// TODO: add creator (JWT token owner) to team if not in signer list, not yet support non signer roles
 export const createMultisigProxyTeam = async (team: {
   name: string
   chain: string
@@ -62,8 +62,8 @@ export const createMultisigProxyTeam = async (team: {
  * 3. update team's multisig_config and addresses
  *
  * Notes:
- * 1. Only signer roles are removed. In the future we may add non signer roles that should not be affected by signers config change (e.g. admin)
- * 2. If a user is signer and has non-signer role, the insert will not update their role to signer, which is expected. (See `constraint` and `update_columns` in the insert_team_user_role mutation)
+ * 1. Only signer roles are removed. In the future we may add non signer roles, which should not be affected by signers config change (e.g. admin)
+ * 2. If a user is signer and has non-signer role, the insert will not change their role to signer, which is expected. (See `constraint` and `update_columns` in the insert_team_user_role mutation)
  */
 const UPDATE_MULTISIG_CONFIG_MUTATION = `
   mutation updateMultisigConfigMutation(
@@ -90,11 +90,62 @@ const UPDATE_MULTISIG_CONFIG_MUTATION = `
     
     insert_team_user_role(
       objects: $roles
-      constraint: team_user_role_user_id_team_id_key
-      update_columns: [user_id, team_id]
+      on_conflict: {
+        constraint: team_user_role_user_id_team_id_key
+        update_columns: [user_id, team_id]
+      }
     ) {
       affected_rows
     }
+
+    update_team_by_pk(
+      pk_columns: { id: $id}, 
+      _set: {
+        multisig_config: $multisigConfig
+        delegatee_address: $delegateeAddress
+      }
+    ) {
+      id
+    }
   }
 `
-export const updateMultisigConfig = () => {}
+
+export const updateMultisigConfig = async (
+  teamId: string,
+  delegateeAddress: string,
+  config: {
+    signers: string[]
+    threshold: number
+  }
+) => {
+  const res = await hasuraRequest(UPDATE_MULTISIG_CONFIG_MUTATION, {
+    id: teamId,
+    multisigConfig: config,
+    delegateeAddress: delegateeAddress,
+    roles: config.signers.map((signer) => ({
+      user: {
+        data: {
+          identifier: signer,
+          identifier_type: "ss58",
+        },
+        // upsert `user` table
+        on_conflict: {
+          constraint: "user_identifier_identifier_type_key",
+          update_columns: ["identifier"],
+        },
+      },
+      team_id: teamId,
+      role: "signer",
+    })),
+    signerAddresses: config.signers,
+  })
+
+  if (res.errors) {
+    console.error("Error in updateMultisigConfig mutation:")
+    console.error(res.errors, config)
+    const [error] = res.errors
+    return { error: error.message }
+  }
+
+  return { success: true, data: res.data }
+}

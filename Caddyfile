@@ -3,10 +3,18 @@
 }
 
 :80 {
-	reverse_proxy :8080
+	handle_path /siws* {
+		reverse_proxy :3031 {
+			trusted_proxies private_ranges
+		}
+	}
 
-	route /helloworld* {
+	handle_path /helloworld* {
 		respond "Hello World"
+	}
+
+	handle {
+		reverse_proxy :8080
 	}
 
 	rate_limit {

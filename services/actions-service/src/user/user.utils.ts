@@ -1,5 +1,5 @@
 import { Request } from "express"
-import { User, getUserById } from "./queries"
+import { User, getUserById } from "./user.queries"
 
 export const getHasuraSession = async (req: Request): Promise<{ user?: User; error?: string }> => {
   const userId = req.body.session_variables?.["x-hasura-user-id"]

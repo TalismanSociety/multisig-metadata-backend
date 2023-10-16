@@ -7,17 +7,14 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json for installing dependencies
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
-
 # Copy the TypeScript configuration
 COPY tsconfig.json ./
 
 # Copy all source files
-COPY src/ ./src/
+COPY . .
 
 # Compile TypeScript to JavaScript
-RUN npm run build
+CMD ["npm", "run", "build"]
 
 # Expose the service on port 3031
 EXPOSE 3031

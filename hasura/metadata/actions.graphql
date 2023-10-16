@@ -14,9 +14,7 @@ type Mutation {
 }
 
 type Mutation {
-  insertMultisigProxy(
-    team: InsertMultisigProxyInput!
-  ): InsertMultisigProxyOutput!
+  insertMultisigProxy(team: InsertMultisigProxyInput!): InsertMultisigProxyOutput!
 }
 
 type Mutation {
@@ -24,10 +22,14 @@ type Mutation {
 }
 
 type Mutation {
-  siwsVerify(
-    address: String!
-    signedMessage: String!
-  ): SiwsVerifyOutput
+  siwsVerify(address: String!, signedMessage: String!): SiwsVerifyOutput
+}
+
+type Mutation {
+  updateMultisigConfig(
+    teamId: String!
+    changeConfigDetails: ChangeConfigDetailsInput!
+  ): InsertMultisigProxyOutput!
 }
 
 input InsertMultisigProxyInput {
@@ -35,7 +37,11 @@ input InsertMultisigProxyInput {
   chain: String!
   multisig_config: json!
   proxied_address: String!
-  delegatee_address: String!
+}
+
+input ChangeConfigDetailsInput {
+  signers: [String!]!
+  threshold: Int!
 }
 
 type Output {
@@ -66,3 +72,12 @@ type InsertMultisigProxyOutput {
   error: String
 }
 
+type CommonActionOutput {
+  success: Boolean!
+  error: String
+}
+
+type CommonOutput {
+  success: Boolean!
+  error: String
+}

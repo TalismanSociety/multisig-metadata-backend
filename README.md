@@ -12,3 +12,7 @@ Hasura will be directly accessible on 8080, and behind a reverse proxy on 80 whi
 
 - Validation of calldata (confirming it exists on-chain) before setting it in the DB
 - Automatically run migration and apply metadata on first run using the CLI
+
+## Known Issues
+
+- Something is broken with the install and build script of services. You need to install and build the services locally first.
