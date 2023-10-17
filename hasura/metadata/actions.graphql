@@ -14,7 +14,9 @@ type Mutation {
 }
 
 type Mutation {
-  insertMultisigProxy(team: InsertMultisigProxyInput!): InsertMultisigProxyOutput!
+  insertMultisigProxy(
+    team: InsertMultisigProxyInput!
+  ): InsertMultisigProxyOutput!
 }
 
 type Mutation {
@@ -22,7 +24,10 @@ type Mutation {
 }
 
 type Mutation {
-  siwsVerify(address: String!, signedMessage: String!): SiwsVerifyOutput
+  siwsVerify(
+    address: String!
+    signedMessage: String!
+  ): SiwsVerifyOutput
 }
 
 type Mutation {
@@ -81,3 +86,4 @@ type CommonOutput {
   success: Boolean!
   error: String
 }
+
