@@ -2,6 +2,13 @@ table:
   name: team
   schema: public
 array_relationships:
+  - name: addresses
+    using:
+      foreign_key_constraint_on:
+        column: team_id
+        table:
+          name: address
+          schema: public
   - name: team_tx_metadata
     using:
       foreign_key_constraint_on:
