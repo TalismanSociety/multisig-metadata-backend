@@ -14,7 +14,11 @@ const jwtSecret = getJwtSecret()
 
 if (!jwtSecret) throw Error("Failed to start service. JWT secret not provided")
 
-app.set("trust proxy", 2)
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`)
+const isDev = process.env.NODE_ENV === "development"
+
+// 2 layers of proxying - AWS load balancer and docker/caddy
+if (!isDev) app.set("trust proxy", 2)
 
 app.use(express.json())
 app.use(
@@ -33,7 +37,7 @@ app.use(
     resave: true,
     saveUninitialized: true,
     proxy: true,
-    cookie: { secure: true, sameSite: "none", httpOnly: true },
+    cookie: isDev ? { secure: false } : { secure: true, sameSite: "none", httpOnly: true },
   })
 )
 
