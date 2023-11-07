@@ -7,11 +7,10 @@ services:
     restart: always
     # todo: automatically load metadata from directory
     volumes:
-      - "./migrations:/hasura-migrations"
-      - "./metadata:/hasura-metadata"
+      - "./hasura:/hasura"
     environment:
-      HASURA_GRAPHQL_MIGRATIONS_DIR: /hasura-migrations
-      HASURA_GRAPHQL_METADATA_DIR: /hasura-metadata
+      HASURA_GRAPHQL_MIGRATIONS_DIR: /hasura/migrations
+      HASURA_GRAPHQL_METADATA_DIR: /hasura/metadata
       # postgres database to store Hasura metadata
       HASURA_GRAPHQL_METADATA_DATABASE_URL: ${PG_DATABASE_URL}
       ## this env var can be used to add the above postgres database to Hasura as a data source. this can be removed/updated based on your needs
@@ -21,9 +20,9 @@ services:
       ## enable debugging mode. It is recommended to disable this in production
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
-      HASURA_GRAPHQL_ENABLE_ALLOWLIST: "true"
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: "public"
       HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+      HASURA_GRAPHQL_JWT_SECRET: ${HASURA_GRAPHQL_JWT_SECRET}
       HASURA_GRAPHQL_METADATA_DEFAULTS: '{"backend_configs":{"dataconnector":{"athena":{"uri":"http://data-connector-agent:8081/api/v1/athena"},"mariadb":{"uri":"http://data-connector-agent:8081/api/v1/mariadb"},"mysql8":{"uri":"http://data-connector-agent:8081/api/v1/mysql"},"oracle":{"uri":"http://data-connector-agent:8081/api/v1/oracle"},"snowflake":{"uri":"http://data-connector-agent:8081/api/v1/snowflake"}}}}'
       ## uncomment next line to run console offline (i.e load console assets from server instead of CDN)
       # HASURA_GRAPHQL_CONSOLE_ASSETS_DIR: /srv/console-assets
@@ -37,12 +36,31 @@ services:
         max-file: "3"
   actions-service:
     build:
-      context: ./actions-service
+      context: ./services/actions-service
       dockerfile: Dockerfile
     ports:
       - "3030:3030"
     environment:
       HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+      HASURA_ENDPOINT: http://graphql-engine:8080
+    depends_on:
+      - graphql-engine
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+  siws-service:
+    build:
+      context: ./services/siws-service
+      dockerfile: Dockerfile
+    ports:
+      - "3031:3031"
+    environment:
+      SIWS_SERVICE_PORT: 3031
+      NODE_ENV: ${NODE_ENV}
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+      HASURA_GRAPHQL_JWT_SECRET: ${HASURA_GRAPHQL_JWT_SECRET}
       HASURA_ENDPOINT: http://graphql-engine:8080
     depends_on:
       - graphql-engine

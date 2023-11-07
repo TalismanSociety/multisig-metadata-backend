@@ -1,3 +1,5 @@
 .env
-actions-service/node_modules
-actions-service/dist
+
+services/**/node_modules
+services/**/dist
+

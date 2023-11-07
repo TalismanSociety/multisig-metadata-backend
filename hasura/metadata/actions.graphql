@@ -1,0 +1,89 @@
+type Mutation {
+  InsertTxMetadataValidated(
+    timepoint_height: Int!
+    timepoint_index: Int!
+    call_data: String!
+    call_hash: String!
+    chain: String!
+    multisig_address: String!
+    proxy_address: String!
+    description: String!
+    change_config_details: json
+    team_id: String!
+  ): Output
+}
+
+type Mutation {
+  insertMultisigProxy(
+    team: InsertMultisigProxyInput!
+  ): InsertMultisigProxyOutput!
+}
+
+type Mutation {
+  siwsNonce: SiwsNonceOutput!
+}
+
+type Mutation {
+  siwsVerify(
+    address: String!
+    signedMessage: String!
+  ): SiwsVerifyOutput
+}
+
+type Mutation {
+  updateMultisigConfig(
+    teamId: String!
+    changeConfigDetails: ChangeConfigDetailsInput!
+  ): InsertMultisigProxyOutput!
+}
+
+input InsertMultisigProxyInput {
+  name: String!
+  chain: String!
+  multisig_config: json!
+  proxied_address: String!
+}
+
+input ChangeConfigDetailsInput {
+  signers: [String!]!
+  threshold: Int!
+}
+
+type Output {
+  success: Boolean!
+  timestamp: timestamptz!
+}
+
+type SiwsNonceOutput {
+  nonce: String!
+}
+
+type SiwsVerifyOutput {
+  accessToken: String!
+}
+
+type CreatedMultisigProxyTeam {
+  id: String!
+  name: String!
+  multisig_config: json!
+  proxied_address: String!
+  delegatee_address: String!
+  chain: String!
+}
+
+type InsertMultisigProxyOutput {
+  success: Boolean!
+  team: CreatedMultisigProxyTeam
+  error: String
+}
+
+type CommonActionOutput {
+  success: Boolean!
+  error: String
+}
+
+type CommonOutput {
+  success: Boolean!
+  error: String
+}
+

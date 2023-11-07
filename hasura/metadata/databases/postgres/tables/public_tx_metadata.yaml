@@ -8,10 +8,18 @@ configuration:
   custom_column_names:
     proxy_address: proxy_address
   custom_root_fields: {}
+object_relationships:
+  - name: team
+    using:
+      foreign_key_constraint_on: team_id
 insert_permissions:
-  - role: public
+  - role: user
     permission:
-      check: {}
+      check:
+        team:
+          users:
+            user_id:
+              _eq: X-Hasura-User-Id
       columns:
         - created
         - call_data
@@ -21,16 +29,25 @@ insert_permissions:
         - chain
         - timepoint_index
         - change_config_details
+        - multisig_address
+        - team_id
 select_permissions:
-  - role: public
+  - role: user
     permission:
       columns:
-        - created
-        - call_data
+        - description
+        - multisig_address
         - proxy_address
         - timepoint_height
-        - description
-        - chain
         - timepoint_index
         - change_config_details
-      filter: {}
+        - call_data
+        - chain
+        - created
+        - team_id
+      filter:
+        team:
+          users:
+            user_id:
+              _eq: X-Hasura-User-Id
+      allow_aggregations: true

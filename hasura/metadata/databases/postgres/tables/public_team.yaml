@@ -1,0 +1,42 @@
+table:
+  name: team
+  schema: public
+array_relationships:
+  - name: addresses
+    using:
+      foreign_key_constraint_on:
+        column: team_id
+        table:
+          name: address
+          schema: public
+  - name: team_tx_metadata
+    using:
+      foreign_key_constraint_on:
+        column: team_id
+        table:
+          name: tx_metadata
+          schema: public
+  - name: users
+    using:
+      foreign_key_constraint_on:
+        column: team_id
+        table:
+          name: team_user_role
+          schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - id
+        - created_at
+        - updated_at
+        - multisig_config
+        - proxied_address
+        - delegatee_address
+        - name
+        - chain
+      filter:
+        users:
+          user_id:
+            _eq: X-Hasura-User-Id
+      allow_aggregations: true

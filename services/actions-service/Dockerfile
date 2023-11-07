@@ -14,10 +14,10 @@ RUN npm install
 COPY tsconfig.json ./
 
 # Copy all source files
-COPY src/ ./src/
+COPY . .
 
 # Compile TypeScript to JavaScript
-RUN npm run build
+CMD ["npm", "run", "build"]
 
 # Expose the service on port 3000
 EXPOSE 3030
