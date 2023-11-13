@@ -1,4 +1,5 @@
 - "!include public_address.yaml"
+- "!include public_audit_team.yaml"
 - "!include public_team.yaml"
 - "!include public_team_user_role.yaml"
 - "!include public_tx_metadata.yaml"

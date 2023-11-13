@@ -1,7 +1,7 @@
 import axios from "axios"
 import { CONFIG } from "./config"
 
-export const hasuraRequest = async (query: string, variables: any) => {
+export const hasuraRequest = async (query: string, variables: any, sessionVariables?: any) => {
   const result = await axios.post(
     `${CONFIG.HASURA_ENDPOINT}/v1/graphql`,
     { query, variables },
@@ -9,6 +9,7 @@ export const hasuraRequest = async (query: string, variables: any) => {
       headers: {
         "Content-Type": "application/json",
         "x-hasura-admin-secret": CONFIG.HASURA_ADMIN_SECRET,
+        ...sessionVariables,
       },
     }
   )

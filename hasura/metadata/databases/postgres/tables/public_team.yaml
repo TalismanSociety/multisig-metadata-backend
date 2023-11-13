@@ -23,6 +23,22 @@ array_relationships:
         table:
           name: team_user_role
           schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        users:
+          user_id:
+            _eq: X-Hasura-User-Id
+      columns:
+        - multisig_config
+        - chain
+        - name
+        - proxied_address
+        - created_at
+        - updated_at
+        - id
+        - delegatee_address
 select_permissions:
   - role: user
     permission:

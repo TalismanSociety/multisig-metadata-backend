@@ -9,16 +9,19 @@ const CREATE_MULTISIG_PROXY_TEAM_MUTATION = `
 `
 
 // TODO: add creator (JWT token owner) to team if not in signer list, not yet support non signer roles
-export const createMultisigProxyTeam = async (team: {
-  name: string
-  chain: string
-  multisig_config: {
-    signers: string[]
-    threshold: number
-  }
-  proxied_address: string
-  delegatee_address: string
-}) => {
+export const createMultisigProxyTeam = async (
+  team: {
+    name: string
+    chain: string
+    multisig_config: {
+      signers: string[]
+      threshold: number
+    }
+    proxied_address: string
+    delegatee_address: string
+  },
+  sessionVariables?: any
+) => {
   const users = team.multisig_config.signers.map((signer) => ({
     role: "signer",
     user: {
@@ -34,18 +37,22 @@ export const createMultisigProxyTeam = async (team: {
       },
     },
   }))
-  const res = await hasuraRequest(CREATE_MULTISIG_PROXY_TEAM_MUTATION, {
-    team: {
-      name: team.name,
-      chain: team.chain,
-      multisig_config: team.multisig_config,
-      proxied_address: team.proxied_address,
-      delegatee_address: team.delegatee_address,
-      users: {
-        data: users,
+  const res = await hasuraRequest(
+    CREATE_MULTISIG_PROXY_TEAM_MUTATION,
+    {
+      team: {
+        name: team.name,
+        chain: team.chain,
+        multisig_config: team.multisig_config,
+        proxied_address: team.proxied_address,
+        delegatee_address: team.delegatee_address,
+        users: {
+          data: users,
+        },
       },
     },
-  })
+    sessionVariables
+  )
 
   if (res.errors) {
     const [error] = res.errors
@@ -116,29 +123,34 @@ export const updateMultisigConfig = async (
   config: {
     signers: string[]
     threshold: number
-  }
+  },
+  sessionVariables: any
 ) => {
-  const res = await hasuraRequest(UPDATE_MULTISIG_CONFIG_MUTATION, {
-    id: teamId,
-    multisigConfig: config,
-    delegateeAddress: delegateeAddress,
-    roles: config.signers.map((signer) => ({
-      user: {
-        data: {
-          identifier: signer,
-          identifier_type: "ss58",
+  const res = await hasuraRequest(
+    UPDATE_MULTISIG_CONFIG_MUTATION,
+    {
+      id: teamId,
+      multisigConfig: config,
+      delegateeAddress: delegateeAddress,
+      roles: config.signers.map((signer) => ({
+        user: {
+          data: {
+            identifier: signer,
+            identifier_type: "ss58",
+          },
+          // upsert `user` table
+          on_conflict: {
+            constraint: "user_identifier_identifier_type_key",
+            update_columns: ["identifier"],
+          },
         },
-        // upsert `user` table
-        on_conflict: {
-          constraint: "user_identifier_identifier_type_key",
-          update_columns: ["identifier"],
-        },
-      },
-      team_id: teamId,
-      role: "signer",
-    })),
-    signerAddresses: config.signers,
-  })
+        team_id: teamId,
+        role: "signer",
+      })),
+      signerAddresses: config.signers,
+    },
+    sessionVariables
+  )
 
   if (res.errors) {
     console.error("Error in updateMultisigConfig mutation:")

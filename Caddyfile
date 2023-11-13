@@ -19,7 +19,7 @@
 
 	rate_limit {
 		zone dynamic {
-			key    "{ http.request.remote_ip }"
+			key    "{http.request.remote.host}"
 			events 30
 			window 5s
 		}

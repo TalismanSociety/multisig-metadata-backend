@@ -69,7 +69,9 @@ export const handleInsertMultisigProxy = async (req: Request, res: Response) => 
       proxied_address: proxiedAddress.toSs58(),
       delegatee_address: multisigAddress.toSs58(),
     }
-    const createdTeam = await createMultisigProxyTeam(teamData)
+    const createdTeam = await createMultisigProxyTeam(teamData, {
+      "x-hasura-user-id": user.id,
+    })
 
     res.status(200).json({
       success: true,
@@ -126,7 +128,8 @@ export const handleUpdateMultisigConfig = async (req: Request, res: Response) =>
       {
         signers: addresses.map((a) => a.toSs58()),
         threshold: changeConfigDetails.threshold,
-      }
+      },
+      { "x-hasura-user-id": user.id }
     )
     if (!success || updateError)
       return res
