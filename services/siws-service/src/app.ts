@@ -3,7 +3,7 @@ import Session from "express-session"
 import crypto from "crypto"
 import jwt from "jsonwebtoken"
 import cors from "cors"
-import { cryptoWaitReady, signatureVerify } from "@polkadot/util-crypto"
+import { SiwsMessage, verifySIWS } from "@talismn/siws"
 import { getOrCreateUserByIdentifier } from "./user"
 import { getJwtSecret } from "./utils"
 
@@ -49,7 +49,7 @@ app.get("/status", (req, res) => {
 app.post("/nonce", async (req, res) => {
   const nonce = crypto.randomUUID()
 
-  // @ts-ignore generate nonce and store in session
+  // @ts-ignore generate nonce and store in session to prevent replay attacks
   req.session.nonce = nonce
 
   return res.json({ nonce })
@@ -60,7 +60,7 @@ app.post("/verify", async (req, res) => {
   try {
     // @ts-ignore
     const { nonce } = req.session
-    const { address, signedMessage } = req.body
+    const { address, message, signature } = req.body
 
     // invalid session
     if (!nonce) {
@@ -68,20 +68,22 @@ app.post("/verify", async (req, res) => {
     }
 
     // missing address or signed message
-    if (!address || !signedMessage) {
-      return res.status(400).json({ error: "Missing Parameters" })
+    if (!address || !message || !signature) {
+      return res.status(400).json({ error: "Invalid verification request!" })
     }
 
-    // construct payload - must match payload in client
-    // TODO: make a package that both frontend and backend use to construct payload
-    const payload = JSON.stringify({ address, nonce }, undefined, 2)
-
-    await cryptoWaitReady()
-    const verification = signatureVerify(payload, signedMessage, address)
-
-    // invalid signature
-    if (!verification.isValid) {
+    // verify signature
+    let siws: SiwsMessage
+    try {
+      siws = await verifySIWS(message, signature, address)
+    } catch (e) {
+      console.error(e)
       return res.status(401).json({ error: "Invalid Signature" })
+    }
+
+    // validate nonce
+    if (siws.nonce !== nonce) {
+      return res.status(401).json({ error: "Invalid nonce. Please try again." })
     }
 
     // get user data from database, create if none

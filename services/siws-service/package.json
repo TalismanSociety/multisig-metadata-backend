@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@polkadot/util-crypto": "^12.5.1",
+    "@talismn/siws": "^0.0.4",
     "@types/cookie-parser": "^1.4.4",
     "@types/cors": "^2.8.14",
     "axios": "^1.5.1",
