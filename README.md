@@ -4,19 +4,14 @@
 
 1. Setup your `.env` file, see `.env.sample` for example:
 
-   - `PG_DATABASE_URL`: The postgres url to connect to your local postgres db. Replace `localhost` with `host.docker.internal`
+   - `PG_DATABASE_URL`: The postgres url to connect to your local postgres db. Replace `localhost` with `host.docker.internal` if you're running locally.
    - `NODE_ENV`: Set to `development` if running the frontend locally via http, which will disable `secure` for SIWS cookie.
    - `HASURA_GRAPHQL_ADMIN_SECRET`: A password used to access your hasura instance. Can be any string.
    - `HASURA_GRAPHQL_JWT_SECRET`: A json object containing your JWT secret's algo and key. see `.env.sample`
 
-2. Build all services manually. The docker setup is broken in our AWS setup now and gets stuck at install and build step. This is expected to be fixed soon, but for now, please cd into each services to run `npm install` and `npm build`.
+2. Run `docker compose up --build -d` to build and start the services.
 
-   - Actions Service: `cd services/actions-service`
-   - SIWS Service: `cd services/siws-service`
-
-3. Run `docker compose up --build -d`. After building all services, you should be able to now run your docker compose command.
-
-4. (Optional) Run `cd hasura && hasura console --admin-secret "{{HASURA_GRAPHQL_ADMIN_SECRET}}"` to start a Hasura dev console. A Hasura dev console will update your local `hasura` dir with all the relevant Hasura generated files that can later be used to update prod.
+3. (Optional) Run `cd hasura && hasura console --admin-secret "{{HASURA_GRAPHQL_ADMIN_SECRET}}"` to start a Hasura dev console. Only changes made via your Hasura dev console will update your local `hasura` dir with all the relevant Hasura generated files that can later be used to update prod.
 
 ## Usage
 
@@ -36,11 +31,6 @@
 |   |-- siws-service            # independent SIWS service that in the future can be extracted out of the repo and hosted on serverless functions
 |__ ...
 ```
-
-## Known Issues
-
-- Something is broken with the install and build script of services. You need to install and build the services locally first.
-- Deployment process is currently manual and broken
 
 ## Future improvement
 

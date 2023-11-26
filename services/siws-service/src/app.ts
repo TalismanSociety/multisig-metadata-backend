@@ -110,8 +110,6 @@ app.post("/verify", async (req, res) => {
   }
 })
 
-app.listen(process.env.SIWS_SERVICE_PORT, () => {
-  console.log(
-    `SIWS service running on http://host.docker.internal:${process.env.SIWS_SERVICE_PORT}/`
-  )
+app.listen(process.env.PORT, () => {
+  console.log(`SIWS service running on http://host.docker.internal:${process.env.PORT}/`)
 })

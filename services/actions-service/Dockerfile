@@ -17,8 +17,11 @@ RUN rm -rf node_modules
 
 RUN npm install --omit=dev
 
-# Expose the service on port 3030
-EXPOSE 3030
+# Default port at 3030
+ARG PORT=3030
+
+# Expose the service on provided port
+EXPOSE $PORT
 
 # Command to run the application
 CMD ["node", "dist/app.js"]

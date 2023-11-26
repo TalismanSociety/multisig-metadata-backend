@@ -11,6 +11,6 @@ app.use(express.json())
 createTxMetadataHandlers(app)
 createTeamHandlers(app)
 
-app.listen(3030, () => {
-  console.log("Webhook service running on http://localhost:3000/")
+app.listen(process.env.PORT, () => {
+  console.log(`Webhook service running on http://localhost:${process.env.PORT}/`)
 })

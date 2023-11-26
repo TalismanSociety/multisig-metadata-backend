@@ -1,18 +1,14 @@
 version: "3.6"
 services:
   graphql-engine:
-    image: hasura/graphql-engine:v2.28.0.cli-migrations-v3
+    build:
+      context: ./hasura
+      dockerfile: Dockerfile
+    image: 008425813248.dkr.ecr.us-east-1.amazonaws.com/signet-backend-hasura
     ports:
       - "8080:8080"
     restart: always
-    # todo: automatically load metadata from directory
-    volumes:
-      - "./hasura:/hasura"
     environment:
-      HASURA_GRAPHQL_MIGRATIONS_DIR: /hasura/migrations
-      HASURA_GRAPHQL_METADATA_DIR: /hasura/metadata
-      # postgres database to store Hasura metadata
-      HASURA_GRAPHQL_METADATA_DATABASE_URL: ${PG_DATABASE_URL}
       ## this env var can be used to add the above postgres database to Hasura as a data source. this can be removed/updated based on your needs
       PG_DATABASE_URL: ${PG_DATABASE_URL}
       ## enable the console served by server
@@ -38,9 +34,11 @@ services:
     build:
       context: ./services/actions-service
       dockerfile: Dockerfile
+    image: 008425813248.dkr.ecr.us-east-1.amazonaws.com/signet-backend-actions
     ports:
       - "3030:3030"
     environment:
+      PORT: 3030
       HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
       HASURA_ENDPOINT: http://graphql-engine:8080
     depends_on:
@@ -54,10 +52,11 @@ services:
     build:
       context: ./services/siws-service
       dockerfile: Dockerfile
+    image: 008425813248.dkr.ecr.us-east-1.amazonaws.com/signet-backend-siws
     ports:
       - "3031:3031"
     environment:
-      SIWS_SERVICE_PORT: 3031
+      PORT: 3031
       NODE_ENV: ${NODE_ENV}
       HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
       HASURA_GRAPHQL_JWT_SECRET: ${HASURA_GRAPHQL_JWT_SECRET}
