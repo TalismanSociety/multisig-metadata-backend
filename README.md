@@ -40,3 +40,12 @@
 ## Known Issues
 
 - Something is broken with the install and build script of services. You need to install and build the services locally first.
+- Deployment process is currently manual and broken
+
+## Future improvement
+
+- [ ] Build a github action that when a PR is created: - install and build all services within github workflow - build docker image and push to AWS ECR - trigger build on a preview instance
+
+## Deploy Script
+
+`rsync -e "ssh -i $HOME/.ssh/signet_aws.pem" -rP signet-backend signet-metadata-1a: --exclude signet-backend/.env`
