@@ -2,13 +2,9 @@ FROM hasura/graphql-engine:v2.28.0.cli-migrations-v3
 
 WORKDIR /hasura
 
-ARG PG_DATABASE_URL
-
 ENV HASURA_GRAPHQL_MIGRATIONS_DIR=/hasura/migrations \
     HASURA_GRAPHQL_METADATA_DIR=/hasura/metadata \
-    HASURA_GRAPHQL_SEEDS_DIR=/hasura/seeds \
-    HASURA_GRAPHQL_METADATA_DATABASE_URL=$PG_DATABASE_URL \
-    PG_DATABASE_URL=$PG_DATABASE_URL
+    HASURA_GRAPHQL_SEEDS_DIR=/hasura/seeds
 
 
 COPY . .

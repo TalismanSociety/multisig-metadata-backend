@@ -11,7 +11,16 @@
 
 2. Run `docker compose up --build -d` to build and start the services.
 
+<<<<<<< Updated upstream
 3. (Optional) Run `cd hasura && hasura console --admin-secret "{{HASURA_GRAPHQL_ADMIN_SECRET}}"` to start a Hasura dev console. Only changes made via your Hasura dev console will update your local `hasura` dir with all the relevant Hasura generated files that can later be used to update prod.
+=======
+3. You should be able to access the services at the url below:
+
+   - SIWS Service: `http://localhost:3031`
+   - Hasura Graphql Endpoint: `http://localhost:8080`
+
+4. (Optional) Run `cd hasura && hasura console --admin-secret "{{HASURA_GRAPHQL_ADMIN_SECRET}}"` to start a Hasura dev console. Only changes made via your Hasura dev console will update your local `hasura` dir with all the relevant Hasura generated files that can later be used to update prod.
+>>>>>>> Stashed changes
 
 ## Usage
 
