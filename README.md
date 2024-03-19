@@ -31,11 +31,3 @@
 |   |-- siws-service            # independent SIWS service that in the future can be extracted out of the repo and hosted on serverless functions
 |__ ...
 ```
-
-## Future improvement
-
-- [ ] Build a github action that when a PR is created: - install and build all services within github workflow - build docker image and push to AWS ECR - trigger build on a preview instance
-
-## Deploy Script
-
-`rsync -e "ssh -i $HOME/.ssh/signet_aws.pem" -rP signet-backend signet-metadata-1a: --exclude signet-backend/.env`
